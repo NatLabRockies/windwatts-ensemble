@@ -81,18 +81,7 @@ pandas, numpy, xarray, xgboost, scikit-learn, h5py, pyarrow, requests, pyproj, s
 
 The package exposes 48 production-stage entry points across 7 sequential stages, plus 5 experiment entry points. See [`PIPELINE.md`](PIPELINE.md) for the complete command reference.
 
-```
-┌─────────────┐    ┌────────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│ Observations │───▶│ Extraction │───▶│ Assembly │───▶│ Training │───▶│ Analysis  │
-│  (4 scripts) │    │(10 scripts)│    │(5 scripts)│    │(2 scripts)│    │(11 scripts)│
-└─────────────┘    └────────────┘    └──────────┘    └────┬─────┘    └──────────┘
-                                                          │
-                                                          ▼
-                                     ┌────────────────┐    ┌──────────────┐
-                                     │ Grid Inference │───▶│ Maps & Output│
-                                     │  (13 scripts)  │    │  (3 scripts) │
-                                     └────────────────┘    └──────────────┘
-```
+<img width="1194" height="387" alt="image" src="https://github.com/user-attachments/assets/75626af4-b282-480a-82da-4c5b4b585852" />
 
 ### Stage 1: Observations (4 scripts)
 
