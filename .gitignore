@@ -1,0 +1,52 @@
+# Data (too large for git)
+data/quantiles/
+data/gwa/
+data/grid/
+data/raw/
+data/e2e/
+data/models/
+data/output/
+data/training/
+data/reference/loocv/
+data/reference/grid/
+asos_data_hpc.tar.gz
+
+# HPC extraction (large data files, keep scripts)
+hpc/grid_data/
+hpc/logs/
+hpc/quantiles/
+
+# Keep small reference files in git
+!data/reference/training/
+!data/reference/analysis/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Environment & secrets
+.env
+*.pem
+*.key
+venv/
+.venv/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log

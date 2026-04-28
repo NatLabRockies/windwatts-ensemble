@@ -1,0 +1,28 @@
+# Source this file from the repository root to activate the local WEM runtime:
+#   source scripts/activate-wem
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    echo "Run this with: source scripts/activate-wem" >&2
+    exit 1
+fi
+
+_wem_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_wem_repo_root="$(cd "${_wem_script_dir}/.." && pwd)"
+
+source "${_wem_repo_root}/.venv/bin/activate"
+
+if command -v brew >/dev/null 2>&1; then
+    _wem_libomp_prefix="$(brew --prefix libomp 2>/dev/null || true)"
+    if [[ -n "${_wem_libomp_prefix}" && -d "${_wem_libomp_prefix}/lib" ]]; then
+        export DYLD_LIBRARY_PATH="${_wem_libomp_prefix}/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
+    fi
+fi
+
+export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/wem-mpl-cache}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/tmp/wem-xdg-cache}"
+mkdir -p "${MPLCONFIGDIR}"
+mkdir -p "${XDG_CACHE_HOME}"
+
+unset _wem_script_dir
+unset _wem_repo_root
+unset _wem_libomp_prefix

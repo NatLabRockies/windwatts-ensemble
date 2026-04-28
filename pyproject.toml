@@ -1,0 +1,144 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wem"
+version = "0.1.0"
+description = "WindWatts Ensemble Model — wind resource ML bias-correction pipeline"
+requires-python = ">=3.10"
+authors = [{name = "National Renewable Energy Laboratory"}]
+license = {text = "BSD-3-Clause"}
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandas>=2.0,<3",
+    "numpy>=1.24,<3",
+    "xarray>=2023.1",
+    "xgboost>=1.7",
+    "scikit-learn>=1.2",
+    "h5py>=3.8",
+    "pyarrow>=14.0",
+    "requests>=2.28",
+    "pyproj>=3.4",
+    "scipy>=1.10",
+    "tqdm>=4.64",
+    "rasterio>=1.3",
+    "joblib>=1.2",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+viz = [
+    "cartopy>=0.21",
+    "shapely>=2.0",
+]
+hpc = [
+    "NREL-rex>=0.4.3",
+]
+hpo = [
+    "optuna>=3.0",
+]
+convnet = [
+    "torch>=2.0",
+]
+dev = [
+    "wem[viz,hpc,hpo,convnet]",
+    "pytest>=7.0",
+]
+
+[project.scripts]
+# Stage 1: Observations
+wem-gs-obs = "wem.acquire.gold_standard_obs:main"
+wem-download-isd = "wem.acquire.download_isd:main"
+wem-process-isd = "wem.acquire.process_isd:main"
+wem-aggregate-asos = "wem.acquire.aggregate_asos:main"
+
+# Stage 2: Extraction (GS)
+wem-gs-era5 = "wem.extract.gs_era5:main"
+wem-gs-wtk = "wem.extract.gs_wtk:main"
+wem-gs-wtkled-conus = "wem.extract.gs_wtkled_conus:main"
+wem-gs-wtkled-climate = "wem.extract.gs_wtkled_climate:main"
+wem-gs-hrrr = "wem.extract.gs_hrrr:main"
+
+# Stage 2: Extraction (ASOS)
+wem-asos-era5 = "wem.extract.asos_era5:main"
+wem-asos-wtk = "wem.extract.asos_wtk:main"
+wem-asos-wtkled-conus = "wem.extract.asos_wtkled_conus:main"
+wem-asos-wtkled-climate = "wem.extract.asos_wtkled_climate:main"
+wem-asos-hrrr = "wem.extract.asos_hrrr:main"
+
+# Stage 3: Assembly
+wem-merge-cohorts = "wem.assemble.merge_cohorts:main"
+wem-add-topo = "wem.assemble.add_topography:main"
+wem-build-neighbors = "wem.assemble.build_neighbors:main"
+wem-obs-wsavg = "wem.assemble.obs_wind_avg:main"
+wem-add-gwa = "wem.assemble.add_gwa:main"
+
+# Stage 4: Training
+wem-train-loocv = "wem.train.loocv_xgb:main"
+wem-train-final = "wem.train.final_xgb:main"
+
+# Stage 5: Analysis
+wem-analyze = "wem.analyze.ml_results:main"
+wem-analyze-extended = "wem.analyze.extended_metrics:main"
+wem-row-metrics = "wem.analyze.row_metrics:main"
+wem-error-diffs = "wem.analyze.error_diffs:main"
+wem-site-cdfs = "wem.analyze.site_cdfs:main"
+wem-viz-fi = "wem.analyze.feature_importance:main"
+wem-qc-filter = "wem.analyze.qc_outliers:main"
+wem-nn-lookup = "wem.analyze.nn_lookup:main"
+wem-grid-means = "wem.analyze.grid_means:main"
+wem-quantile-maps = "wem.analyze.quantile_maps:main"
+wem-interannual = "wem.analyze.interannual:main"
+
+# Stage 6: Grid inference
+wem-build-grid = "wem.grid.build_grid:main"
+wem-grid-era5 = "wem.grid.grid_era5:main"
+wem-grid-hrrr = "wem.grid.grid_hrrr:main"
+wem-grid-wtk = "wem.grid.grid_wtk:main"
+wem-grid-wtkled = "wem.grid.grid_wtkled:main"
+wem-merge-tiles = "wem.grid.merge_tiles:main"
+wem-merge-grid = "wem.grid.merge_grid:main"
+wem-grid-elev = "wem.grid.add_grid_elev:main"
+wem-fill-missing = "wem.grid.fill_missing:main"
+wem-prepare-inference = "wem.grid.prepare_inference:main"
+wem-grid-gwa = "wem.grid.add_grid_gwa:main"
+wem-infer = "wem.grid.infer_xgb:main"
+wem-pivot-predictions = "wem.grid.pivot_predictions:main"
+
+# Stage 7: Maps & output
+wem-maps-mean = "wem.maps.mean_wind_maps:main"
+wem-maps-diff = "wem.maps.diff_maps:main"
+wem-app-format = "wem.maps.app_format:main"
+
+# Experiment infrastructure (not part of production pipeline)
+wem-exp-hpo = "wem.experiment.optuna_hpo:main"
+wem-exp-param-sweep = "wem.experiment.param_sweep:main"
+wem-exp-feature-sweep = "wem.experiment.feature_sweep:main"
+wem-exp-analyze-sweep = "wem.experiment.analyze_sweep:main"
+wem-experiment = "wem.experiment.runner:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = ["-v", "--tb=short", "--strict-markers"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "requires_cartopy: requires cartopy + shapely",
+    "requires_rasterio: requires rasterio",
+    "requires_rex: requires rex for HDF5 access",
+    "requires_xgboost: requires xgboost",
+    "requires_network: requires internet access",
+    "requires_torch: requires PyTorch",
+]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wem*"]
