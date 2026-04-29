@@ -52,9 +52,14 @@ def read_tile(fp: Path) -> pd.DataFrame:
     if missing:
         raise ValueError(f"{fp.name} missing required columns: {missing}")
 
-    for qc in QCOLS:
-        if qc not in df.columns:
-            df[qc] = np.nan
+    missing_qcols = [qc for qc in QCOLS if qc not in df.columns]
+    if missing_qcols:
+        log(f"[WARN] {fp.name} missing {len(missing_qcols)} quantile columns: "
+            f"{missing_qcols[0]}..{missing_qcols[-1]} — filling with NaN")
+        df = pd.concat(
+            [df, pd.DataFrame(np.nan, index=df.index, columns=missing_qcols)],
+            axis=1,
+        )
 
     df = df[KEEP].copy()
     df["grid_id"] = df["grid_id"].astype("string")
